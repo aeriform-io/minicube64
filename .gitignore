@@ -11,3 +11,4 @@ makefile
 makefileold
 MiniCube.make
 *.o 
+.DS_Store

@@ -8,7 +8,7 @@
 
 static uint32_t  g_width  = 64*MACHINE_SCALE;
 static uint32_t  g_height = 64*MACHINE_SCALE;
-static uint32_t *g_buffer = 0x0;
+uint32_t *g_buffer = 0x0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static int CalcScale(int bmpW, int bmpH, int areaW, int areaH)
@@ -120,13 +120,16 @@ int main(int argc,char **argv)
     mfb_update_state state;
     do {
 
-				display_machine(window);
+
 
         state = mfb_update_ex(window, g_buffer, g_width, g_height);
         if (state != STATE_OK) {
             window = 0x0;
             break;
         }
+		display_machine(window);
+
+
     } while(mfb_wait_sync(window));
 
 		kill_machine();

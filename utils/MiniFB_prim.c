@@ -7,11 +7,15 @@
 #include "WindowData.h"
 #include <MiniFB_internal.h>
 
+extern uint32_t *g_buffer;
+
+
 uint32_t mfb_getpix(struct mfb_window *window,int x,int y)
 {
 	unsigned int *buffer;
 	SWindowData *window_data = (SWindowData *) window;
 	buffer = (unsigned int*) window_data->draw_buffer;
+  buffer = g_buffer;
 	if (buffer!=NULL)
 	{
 		if ((x>=0) && (x<window_data->buffer_width) && 

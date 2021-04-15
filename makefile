@@ -14,7 +14,6 @@ CFLAGS += -I machine
 CFLAGS += -I machine 
 CFLAGS += -I minifb/include 
 CFLAGS += -I minifb/src
-
 # files to link
 
 OBJ = main.o 
@@ -30,7 +29,7 @@ OBJ += minifb/src/MiniFB_timer.o
 
 # link flags 
 
-LDFLAGS = -Os -s
+LDFLAGS = -Os
 
 # OS SPECIFIC 
 
@@ -41,11 +40,12 @@ ifeq ($(OS),Windows_NT)
 else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Darwin)
-		MINIFB += minifb/src/macosx/*.m
-		OBJ += minifb/src/macosx/OSXView.m  
-		OBJ += minifb/src/macosx/OSXViewDelegate.m  
-		OBJ += minifb/src/macosx/OSXWindow.m  
 		CFLAGS += -DUSE_METAL_API
+		OBJ += minifb/src/macosx/OSXView.m.o
+		OBJ += minifb/src/macosx/OSXViewDelegate.m.o 
+		OBJ += minifb/src/macosx/OSXWindow.m.o
+		OBJ += minifb/src/macosx/MacMiniFB.m.o
+		CFLAGS += -I minifb/macosx
 		LDFLAGS += -framework Cocoa -framework QuartzCore -framework Metal -framework MetalKit -framework AudioToolbox
 	else ifeq ($(UNAME_S),Linux)
 		MINIFB += minifb/src/x11/*.c
@@ -55,12 +55,10 @@ endif
 
 # work
 
-.c.o: $(HDRS) makefile
-	$(CC) $(CFLAGS) -c -o $@ $<
+%.m.o:	%.m
+	$(CC) -c -o $@ $< $(CFLAGS)
 
-OBJS=$(subst .c,.o,$(TSRCS))
-
-%.o: %.c $(DEPS)
+%.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 minicube$(EXT): $(OBJ)

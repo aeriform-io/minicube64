@@ -5,3 +5,8 @@ examples/input_demo.bin
 main
 main.exe
 minicube.exe
+_build/*
+
+makefile
+makefileold
+MiniCube.make

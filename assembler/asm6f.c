@@ -1601,6 +1601,8 @@ label *to_label(uint16_t v)
 {
 	label *l;
 	int i;
+	if (labellist==NULL)
+		return NULL;
 	for(i=labelstart;i<=labelend;i++)
 	{
 		l=labellist[i];

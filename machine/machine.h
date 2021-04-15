@@ -1,5 +1,10 @@
+#include <MiniFB.h>
+
+#define MACHINE_SCALE 4
+
 void reset_machine();
-void display_machine(int g_width,int g_height,uint32_t *g_buffer);
+void display_machine(struct mfb_window *window);
+void next_view();
 void kill_machine();
 
 #define IO_VIDEO 0x100 

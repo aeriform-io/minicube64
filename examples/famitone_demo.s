@@ -28,10 +28,8 @@ ENDE
 	inx 
 	stx APU_DMC_FREQ
 
-	_setw dmc_c6,apd_src 
-	_setw $e000,apd_dest
-	jsr dc64f
-	lda #$e0 
+
+	lda #>song
 	sta AUDIO
 
 	ldx #<after_the_rain_music_data	;initialize using the first song data, as it contains the DPCM sound effect
@@ -171,11 +169,7 @@ offscreen_addr:
 	FT_SFX_STREAMS	= 4		;number of sound effects played at once, 1..4
 
 	FT_DPCM_ENABLE			;undefine to exclude all DMC code
- ;	FT_SFX_ENABLE			;undefine to exclude all sound effects code
-; 	FT_THREAD				;undefine if you are calling sound effects from the same thread as the sound update call
-
-; FT_PAL_SUPPORT			;undefine to exclude PAL support
- 	FT_NTSC_SUPPORT			;undefine to exclude NTSC support
+	FT_NTSC_SUPPORT			;undefine to exclude PAL support
 
 
 	include "examples/dcf6.s"
@@ -194,8 +188,9 @@ image:
 clut:
 	incbin "examples/data/helmet.pal"
 
-dmc_c6:	
-	incbin "examples/famitone2/after_the_rain.c6f"
+	align 256
+song:
+	incbin "examples/famitone2/after_the_rain.dmc"
 
 ;E:/Projects/tinyfb2/distro/examples/famitone2/after_the_rain.dmc
 ;E:/Projects/tinyfb2/distro/examples/famitone2/after_the_rain.c6f

@@ -1,8 +1,8 @@
 
 CC = gcc
-SOURCE = main.c cpu/fake6502.c assembler/asm6f.c apu/nes_apu.c machine/machine.c
-CFLAGS = -I minifb/include -I minifb/src -I cpu -I sokol -I assembler -I apu -DASM_LIB -I . -I utils -I machine
-MINIFB = minifb/src/*.c
+SOURCE = main.c cpu/fake6502.c assembler/asm6f.c machine/machine.c apu/wsg.c apu/nes_apu.c 
+CFLAGS = -I minifb/include -I minifb/src -I cpu -I sokol -I assembler -I apu -DASM_LIB -I . -I utils -I machine -DNES_APU 
+MINIFB = minifb/src/*.c utils/MiniFB_prim.c 
 
 ifeq ($(OS),Windows_NT)
 	EXT = .exe
@@ -20,6 +20,6 @@ else
 	endif
 endif
 
-minicube$(EXT) : $(SOURCE)
+minicube$(EXT) : $(SOURCE) machine/machine.h
 	$(CC) $(CFLAGS) $^ $(MINIFB) -s -Os $(LDFLAGS) -o $@
 

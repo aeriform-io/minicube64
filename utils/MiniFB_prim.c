@@ -144,7 +144,7 @@ void mfb_circle_fill(struct mfb_window *window,int sx, int sy, int radius, uint3
 }
 
 
-#if 1
+#if 0
 
 char vincent_data[128][8] = { 
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0000 (nul)
@@ -287,7 +287,7 @@ void mfb_putchv(struct mfb_window *window,unsigned short c,int x, int y,uint32_t
 		unsigned char bits = vincent_data[c][j];
 		for(i = 0; i < 8 ; i++)
 		{
-			if(!(bits & (1 << (i)))==0)
+			if( bits & (1 << i)!=0)
 				mfb_setpix(window,x+i,y+j,rgba);
 		}
 	}
@@ -316,7 +316,6 @@ static int stb_fontinit=0;
 		p++;
 	}
 }
-
 
 #else
 

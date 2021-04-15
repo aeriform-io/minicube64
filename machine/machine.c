@@ -22,6 +22,7 @@ MsfGifState gifState = {};
 
 uint8_t memory[1<<16];
 uint8_t default_palette[768];
+int debug_view = 0;
 
 
 #ifdef NES_APU
@@ -96,6 +97,7 @@ void reset_machine(char *fname)
 {
 char debug_line[256];
 
+	debug_view = 0;
 	memset(audio_buffer,0,sizeof(audio_buffer));
 
 	for (int i = 0; i < 256*256; ++i)
@@ -157,7 +159,6 @@ char debug_line[256];
 	saudio_setup(&(saudio_desc){.stream_cb = my_stream_callback,.num_channels = 1});
 }
 
-int debug_view = 0;
 void next_view()
 {
 	debug_view++;

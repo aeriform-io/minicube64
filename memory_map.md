@@ -63,11 +63,8 @@ Video memory is a simple 64x64 pixel framebuffer with 8 bits per pixel.
 This buffer can be located on any 4kb page inside the computer RAM.
 
 ##### Colors 
-The system has a default color set of RGB222 like Sega Master System.
-this can be changed by setting the Palette register to any number above 0x2.
-( less than two is functionally useless, and simply resets to default colors) 
-If Palette registers is > 0x02 we treat that as the high byte of the lookup 
-address. which contains 64 * 3 bytes for R8G8B8. 
+If Palette register is > 0x02 we treat that as the high byte of the lookup 
+address. which contains 256 * 3 bytes for R8G8B8. 
 *note*
 Adjusting these values will ONLY take affect at the end of the frame. ( no raster tricks )
 

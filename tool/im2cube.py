@@ -55,10 +55,9 @@ def main():
 			outraw.write(p.to_bytes(1,byteorder='big'))
 
 	for (r,g,b) in palette:
-		# save as bgr
-		outclut.write(b.to_bytes(1,byteorder='big'))
-		outclut.write(g.to_bytes(1,byteorder='big'))
 		outclut.write(r.to_bytes(1,byteorder='big'))
+		outclut.write(g.to_bytes(1,byteorder='big'))
+		outclut.write(b.to_bytes(1,byteorder='big'))
 
 	outraw.close()
 	outclut.close()

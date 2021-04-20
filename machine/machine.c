@@ -72,18 +72,18 @@ void write6502(uint16_t address, uint8_t value)
 #ifdef NES_APU
 	if ((address>=IO_AUDIO_REGS) && (address<=(IO_AUDIO_REGS+0x20)))
 	{
-		apu_write(address,value);	
+		apu_write(address,value);
 	}
 #endif
 //	printf("W8 %x = %x\n",address,value);
-	memory[address] = value;	
+	memory[address] = value;
 }
 
 void my_stream_callback(float* buffer, int num_frames, int num_channels)
 {
 #ifdef NES_APU
 	apu_process(audio_buffer,2048);
-#else 
+#else
 	wsg_play(audio_buffer, 2048);
 #endif
 
@@ -125,7 +125,7 @@ char debug_line[256];
 			*ptr++='n';
 			*ptr = 0;
 			cpu_asmfile(fname);
-			disk_load_to(debug_line,&memory[0x200]);			
+			disk_load_to(debug_line,&memory[0x200]);
 		}
 		else {
 			ptr=strstr(fname,".bin");
@@ -136,7 +136,7 @@ char debug_line[256];
 			}
 		}
 	}
-	else 
+	else
 	{
 		printf("nothing to do\n");
 		exit(0);
@@ -190,8 +190,7 @@ void display_machine(struct mfb_window *window)
 			{
 				uint8_t byt = vram[i&0xfff];
 				int lookup = byt*3;
-
-				mfb_rect_fill(window,x*MACHINE_SCALE,y*MACHINE_SCALE,MACHINE_SCALE,MACHINE_SCALE,MFB_RGB(palette[lookup+2], palette[lookup+1],palette[lookup]));
+				mfb_rect_fill(window,x*MACHINE_SCALE,y*MACHINE_SCALE,MACHINE_SCALE,MACHINE_SCALE,MFB_RGB(palette[lookup], palette[lookup+1],palette[lookup+2]));
 				i++;
 			}
 		}
@@ -210,11 +209,7 @@ void display_machine(struct mfb_window *window)
 				uint8_t byt = vram[i&0xfff];
 				int lookup = byt*3;
 
-	//			mfb_rect_fill(window,x*MACHINE_SCALE,y*MACHINE_SCALE,MACHINE_SCALE,MACHINE_SCALE,MFB_RGB(palette[lookup+2], palette[lookup+1],palette[lookup]));
-				mfb_setpix(window,((64*MACHINE_SCALE)-64)+x,y,MFB_RGB(palette[lookup+2], palette[lookup+1],palette[lookup]));
-
-	//			g_buffer[x+(y*64)] = MFB_RGB(palette[lookup+2], palette[lookup+1],palette[lookup]); 
-	//			gif_frame[x+(y*64)] = MFB_RGB(palette[lookup], palette[lookup+1],palette[lookup+2]);
+				mfb_setpix(window,((64*MACHINE_SCALE)-64)+x,y,MFB_RGB(palette[lookup], palette[lookup+1],palette[lookup+2]));
 				i++;
 			}
 		}
@@ -225,7 +220,7 @@ void display_machine(struct mfb_window *window)
 		{
 			char debug_line[256];
 			uint16_t len = disasm6502(npc,debug_line,256);
-			
+
 			mfb_print(window,0,y,MFB_RGB(255,255,255),debug_line);
 			npc+=len;
 		}
@@ -251,12 +246,7 @@ void display_machine(struct mfb_window *window)
 		for (int x=0;x<64*MACHINE_SCALE;x++)
 		{
 			uint32_t p = mfb_getpix(window,x,y);
-			uint32_t c = 0;
-			//	remap
-			c = (p & 0xff0000) >> 16; 
-			c |= (p & 0xff00) ; 
-			c |= (p & 0xff) << 16; 
-			gif_frame[i] = c;
+			gif_frame[i] = p;
 			i++;
 		}
 	}
@@ -270,14 +260,14 @@ void display_machine(struct mfb_window *window)
 }
 
 void kill_machine()
-{	
+{
 	MsfGifResult result = msf_gif_end(&gifState);
 	FILE * fp = fopen("minicube.gif", "wb");
 	fwrite(result.data, result.dataSize, 1, fp);
 	fclose(fp);
 	msf_gif_free(result);
 #ifdef NES_APU
-	apu_destroy(&APU);	
+	apu_destroy(&APU);
 #endif
 	saudio_shutdown();
 }

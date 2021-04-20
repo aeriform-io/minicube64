@@ -1,9 +1,9 @@
-	include "examples/64cube.inc"
+	include "64cube.inc"
 
 ENUM $2
-clock rBYTE 1 
+clock rBYTE 1
 frame rBYTE 1
-page	rBYTE 1 
+page	rBYTE 1
 offscreen rBYTE 1
 music_ptr rWORD 1
 tmp 			rBYTE 1
@@ -19,13 +19,13 @@ colorram = $3f00
 
 ENDE
 
-	;	we ALWAYS boot to $200 
+	;	we ALWAYS boot to $200
 
-	org $200 
+	org $200
 	sei
-	ldx #$ff	;	set stack 
+	ldx #$ff	;	set stack
 	txs
-	inx 
+	inx
 	stx APU_DMC_FREQ
 
 
@@ -46,19 +46,19 @@ ENDE
 
 	lda #>colorram
 	sta COLORS
-	lda #$0f 
+	lda #$0f
 	sta VIDEO
 
 
-	lda #$00 
+	lda #$00
 	sta clock
-	sta frame 
+	sta frame
 
-	_setw image,apd_src 
+	_setw image,apd_src
 	_addwi apd_src,0,apd_src
 	_setw $8000,apd_dest
 	jsr dc64f
-	
+
 
 	_setb $f0,offscreen
 
@@ -67,15 +67,15 @@ ENDE
 
 	jsr blitonce
 
-	cli 
+	cli
 lock:
 	jmp lock
 
 blitonce:
 	_setw $f240,blit_dst_l
-	ldx #$00 
+	ldx #$00
 @ycolorsloop
-	ldy #$00 
+	ldy #$00
 @colors
 	txa
 	sta (blit_dst_l),y
@@ -88,8 +88,8 @@ blitonce:
 	lda tmp
 	clc
 	adc #$1
-	inx 
-	cpx #24 
+	inx
+	cpx #24
 	bne @ycolorsloop
 
 	_setb $33,blit_key
@@ -98,35 +98,35 @@ blitonce:
 	_setb 64,blit_stride
 	_setw $8000,blit_src_l
 
-	ldx #$00 
-	ldy #$00 
+	ldx #$00
+	ldy #$00
 	jsr blitter_key
 	rts
 
 
 irq:
-	inc clock 
+	inc clock
 
 	ldy clock
-	clc 
-	lda #$00 
+	clc
+	lda #$00
 ;	* 3
 	adc sinus,y
 	adc sinus,y
 	adc sinus,y
 	tax
 	ldy #$03
-@yloop 
+@yloop
 	inx
 	txa
 	and #$7f
-	tax 
+	tax
 
-	lda clut,x 
-	sta colorram,y 
+	lda clut,x
+	sta colorram,y
 	iny
 	cpy #63*3
-	bne @yloop 
+	bne @yloop
 
 	jsr FamiToneUpdate		;update sound
 
@@ -136,26 +136,26 @@ irq:
 blitter_key:
 	;	x coord in 0-3f range
 	lda #$00
-	sta blit_dst_l 
+	sta blit_dst_l
 	lda offscreen
 	sta blit_dst_h
 
-	ldx #$00 
+	ldx #$00
 @blitter_yloop:
-	ldy #$00 
+	ldy #$00
 @blitter_xloop:
-	lda (blit_src_l),y 
+	lda (blit_src_l),y
 	cmp blit_key
 	beq @noblit
-	sta (blit_dst_l),y 
+	sta (blit_dst_l),y
 @noblit:
-	iny 
+	iny
 	cpy blit_w
 	bne @blitter_xloop
 	_addwb blit_src_l,blit_stride,blit_src_l
 	_addwi blit_dst_l,64,blit_dst_l
-	inx 
-	cpx blit_h 
+	inx
+	cpx blit_h
 	bne @blitter_yloop
 	rts
 
@@ -172,25 +172,25 @@ offscreen_addr:
 	FT_NTSC_SUPPORT			;undefine to exclude PAL support
 
 
-	include "examples/dcf6.s"
+	include "demos/famitone/dcf6.s"
 
-	include "examples/famitone2/_asm6.asm"
-	include "examples/famitone2/after_the_rain.asm"
+	include "demos/famitone/famitone2/_asm6.asm"
+	include "demos/famitone/famitone2/after_the_rain.asm"
 
 ;	include "asmdata/danger_streets.asm"
 ;	include "asmdata/shovel_knight_ost_strike_the_earth_plains_of_passage.asm"
 
-sinus:	
-	incbin	"examples/data/sin.bin"
+sinus:
+	incbin	"demos/famitone/data/sin.bin"
 image:
-	incbin "examples/data/boot.c6f"
+	incbin "demos/famitone/data/boot.c6f"
 	align 256
 clut:
-	incbin "examples/data/helmet.pal"
+	incbin "demos/famitone/data/helmet.pal"
 
 	align 256
 song:
-	incbin "examples/famitone2/after_the_rain.dmc"
+	incbin "demos/famitone/famitone2/after_the_rain.dmc"
 
 ;E:/Projects/tinyfb2/distro/examples/famitone2/after_the_rain.dmc
 ;E:/Projects/tinyfb2/distro/examples/famitone2/after_the_rain.c6f

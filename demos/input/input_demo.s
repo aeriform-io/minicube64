@@ -1,4 +1,4 @@
- include "examples/64cube.inc"
+ include "64cube.inc"
 
 ENUM $0
   src_l rBYTE 1
@@ -206,6 +206,6 @@ Loop:
 
 
   org $0500
-  incbin "examples/input_demo/padone.pal"
+  incbin "demos/input/pad_one.pal"
   image:
-  incbin "examples/input_demo/padone.raw"
+  incbin "demos/input/pad_one.raw"

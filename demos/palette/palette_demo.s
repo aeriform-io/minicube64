@@ -48,25 +48,44 @@ irq:
 
   org $0500
 
-  ; Palettes can be defined in a separate file
-  ; include "demos/palette/palettes/pico8.s"
-  ; include "demos/palette/palettes/naji16.s"
-  ; include "demos/palette/palettes/darkseed.s"
+; Palettes can be defined in a separate file
+; include "demos/palette/palettes/naji16.s"
+; include "demos/palette/palettes/darkseed.s"
 
+; Palettes can be defined in hex notation
 ; DAWNBRINGER
-  DB $14,$0c,$1c
-  DB $44,$24,$34
-  DB $30,$34,$6d
-  DB $4e,$4a,$4e
-  DB $85,$4c,$30
-  DB $34,$65,$24
-  DB $d0,$46,$48
-  DB $75,$71,$61
-  DB $59,$7d,$ce
-  DB $d2,$7d,$2c
-  DB $85,$95,$a1
-  DB $6d,$aa,$2c
-  DB $d2,$aa,$99
-  DB $6d,$c2,$ca
-  DB $da,$d4,$5e
-  DB $de,$ee,$d6
+  hex 140c1c
+  hex 442434
+  hex 30346d
+  hex 4e4a4e
+  hex 854c30
+  hex 346524
+  hex d04648
+  hex 757161
+  hex 597dce
+  hex d27d2c
+  hex 8595a1
+  hex 6daa2c
+  hex d2aa99
+  hex 6dc2ca
+  hex dad45e
+  hex deeed6
+
+; Palettes can also be defined in byte notation
+; PICO8
+; byte $00,$00,$00
+; byte $1D,$2B,$53
+; byte $7E,$25,$53
+; byte $00,$87,$51
+; byte $AB,$52,$36
+; byte $5F,$57,$4F
+; byte $C2,$C3,$C7
+; byte $FF,$F1,$E8
+; byte $FF,$00,$4D
+; byte $FF,$A3,$00
+; byte $FF,$EC,$27
+; byte $00,$E4,$36
+; byte $29,$AD,$FF
+; byte $83,$76,$9C
+; byte $FF,$77,$A8
+; byte $FF,$CC,$AA

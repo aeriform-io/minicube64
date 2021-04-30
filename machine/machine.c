@@ -199,7 +199,7 @@ void display_machine(struct mfb_window *window)
 	if (debug_view==1)
 	{
 		// 	scaled down with debug
-		mfb_rect_fill(window,0,0,(64*MACHINE_SCALE),(64*MACHINE_SCALE),0x00000000);
+		mfb_rect_fill(window,0,0,(64*MACHINE_SCALE),(64*MACHINE_SCALE),0x00101010);
 
 		i = 0;
 		for (int y=0;y<64;y++)
@@ -214,9 +214,13 @@ void display_machine(struct mfb_window *window)
 			}
 		}
 
+		char regs_line[256];
+		sprintf(regs_line, "SP:%d A:%d X:%d Y:%d", sp, a, x, y);
+		mfb_print(window,0,0,MFB_RGB(0,255,255),regs_line);
+
 		uint16_t npc = pc;
 
-		for (int y=0;y<64*MACHINE_SCALE;y+=8)
+		for (int y=10;y<64*MACHINE_SCALE;y+=8)
 		{
 			char debug_line[256];
 			uint16_t len = disasm6502(npc,debug_line,256);

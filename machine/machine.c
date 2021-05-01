@@ -215,7 +215,9 @@ void display_machine(struct mfb_window *window)
 		}
 
 		char regs_line[256];
-		sprintf(regs_line,"%04d SP:%02X A:%02X X:%02X Y:%02X", pc,sp,a,x,y);
+		uint8_t v = read6502(IO_VIDEO);
+		uint8_t kb = read6502(IO_INPUT);
+		sprintf(regs_line,"%04d SP:%02X A:%02X X:%02X Y:%02X VP:%X P1:%X", pc,sp,a,x,y,v,kb);
 		mfb_print(window,0,0,MFB_RGB(0,255,255),regs_line);
 
 		uint16_t npc = pc;

@@ -215,7 +215,7 @@ void display_machine(struct mfb_window *window)
 		}
 
 		char regs_line[256];
-		sprintf(regs_line, "SP:%d A:%d X:%d Y:%d", sp, a, x, y);
+		sprintf(regs_line,"%04d SP:%02X A:%02X X:%02X Y:%02X", pc,sp,a,x,y);
 		mfb_print(window,0,0,MFB_RGB(0,255,255),regs_line);
 
 		uint16_t npc = pc;
@@ -228,7 +228,6 @@ void display_machine(struct mfb_window *window)
 			mfb_print(window,0,y,MFB_RGB(255,255,255),debug_line);
 			npc+=len;
 		}
-
 
 		for (int i = 0; i < 256; ++i)
 		{

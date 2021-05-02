@@ -217,12 +217,25 @@ void display_machine(struct mfb_window *window)
 		char regs_line[256];
 		uint8_t v = read6502(IO_VIDEO);
 		uint8_t kb = read6502(IO_INPUT);
-		sprintf(regs_line,"%04d SP:%02X A:%02X X:%02X Y:%02X VP:%X P1:%X", pc,sp,a,x,y,v,kb);
+		sprintf(regs_line,"%04d SP:%02X A:%02X X:%02X Y:%02X VP:%X P1:%02X", pc,sp,a,x,y,v,kb);
 		mfb_print(window,0,0,MFB_RGB(0,255,255),regs_line);
+
+		uint8_t addr = 0;
+		for (int y=72;y<200;y+=8)
+		{
+			for (int x=99;x<64*MACHINE_SCALE;x+=10)
+			{
+				char regs_line[256];
+				uint8_t test = memory[addr];
+				sprintf(regs_line,"%02X", test);
+				mfb_print(window,x,y,MFB_RGB(255,255,255),regs_line);
+				addr++;
+			}
+		}
 
 		uint16_t npc = pc;
 
-		for (int y=10;y<64*MACHINE_SCALE;y+=8)
+		for (int y=8;y<64*MACHINE_SCALE;y+=8)
 		{
 			char debug_line[256];
 			uint16_t len = disasm6502(npc,debug_line,256);
@@ -240,8 +253,6 @@ void display_machine(struct mfb_window *window)
 									192+f*32.0f,
 									MFB_RGB(255,255,255));
 		}
-
-
 	}
 
 	//	save gif

@@ -254,7 +254,7 @@ void display_machine(struct mfb_window *window)
 			float f = CLAMP((((float)byt/32767.0f)),-1.0f,1.0f);
 			mfb_setpix(window,
 									i,
-									192+f*32.0f,
+									222+f*32.0f,
 									MFB_RGB(255,255,255));
 		}
 	}

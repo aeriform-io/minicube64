@@ -226,9 +226,13 @@ void display_machine(struct mfb_window *window)
 			for (int x=99;x<64*MACHINE_SCALE;x+=10)
 			{
 				char regs_line[256];
-				uint8_t test = memory[addr];
-				sprintf(regs_line,"%02X", test);
-				mfb_print(window,x,y,MFB_RGB(255,255,255),regs_line);
+				uint8_t zp = memory[addr];
+				sprintf(regs_line,"%02X", zp);
+				if (zp==0) {
+					mfb_print(window,x,y,MFB_RGB(64,64,64),"--");
+				} else {
+					mfb_print(window,x,y,MFB_RGB(255,255,255),regs_line);
+				}
 				addr++;
 			}
 		}

@@ -106,9 +106,9 @@ char debug_line[256];
 	//	default palette
 	for (int q=0;q<240;q++)
 	{
-		default_palette[(q*3)+2] = (q % 6) * 0x33;
+		default_palette[(q*3)+0] = (q % 6) * 0x33;
 		default_palette[(q*3)+1] = ((q/6) % 6) * 0x33;
-		default_palette[(q*3)+0] = ((q/36) % 6) * 0x33;
+		default_palette[(q*3)+2] = ((q/36) % 6) * 0x33;
 	}
 
 

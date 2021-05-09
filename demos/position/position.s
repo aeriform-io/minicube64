@@ -9,9 +9,9 @@ ENUM $0
   mask        rBYTE 1
   xpos        rBYTE 1
   ypos        rBYTE 1
-  temp        rBYTE 1
   dst_l       rBYTE 1
   dst_h       rBYTE 1
+  temp        rBYTE 1
 ENDE
 
   org $200
@@ -26,9 +26,8 @@ Boot:
   lda #$5
   sta COLORS
 
-  lda #28
+  lda #64-36
   sta xpos
-  lda #14
   sta ypos
 
   _setw IRQ, VBLANK_IRQ
@@ -70,7 +69,7 @@ IRQ:
     and #%00100000
     beq NoDN
     lda ypos
-    cmp #28
+    cmp #64-7
     beq NoDN
     inc ypos
   NoDN:
@@ -89,7 +88,7 @@ IRQ:
     and #%10000000
     beq NoRT
     lda xpos
-    cmp #57
+    cmp #64-7
     beq NoRT
     inc xpos
   NoRT:
@@ -98,9 +97,8 @@ IRQ:
     lda INPUT
     and #%00001111
     beq NoOther
-    lda #28
+    lda #64-36
     sta xpos
-    lda #14
     sta ypos
   NoOther:
 
@@ -114,6 +112,8 @@ SetPos:
 	clc
 
 	tya
+	ror
+	ror temp
 	ror
 	ror temp
 	ror
@@ -196,8 +196,7 @@ Clear:
   org $0500
 
 palette:
-  hex 0052cc
-  hex ffffff
+  hex 0052cc ffffff
 
 sprite:
   DB $01,$00,$01,$00,$00,$00,$00,$00

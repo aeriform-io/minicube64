@@ -134,12 +134,16 @@ char debug_line[256];
 				sprintf(debug_line,"%s",fname);
 				disk_load_to(debug_line,&memory[0x200]);
 			}
+			else {
+				printf("FILE NOT FOUND.\n");
+				disk_load_to("boot.bin",&memory[0x200]);
+			}
 		}
 	}
 	else
 	{
-		printf("nothing to do\n");
-		exit(0);
+		printf("NO CART LOADED.\n");
+		disk_load_to("boot.bin",&memory[0x200]);
 	}
 	reset6502();
 	pc = 0x200;

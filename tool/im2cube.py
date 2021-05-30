@@ -62,7 +62,9 @@ def main():
             p = original_index_to_index[image.getpixel((tx,ty))]
             outraw.write(p.to_bytes(1,byteorder='big'))
 
-    for (r,g,b) in palette:
+    for i in range(len(palette)):
+        (r,g,b) = palette[i]
+        print('index %02x: #%02x%02x%02x' % (i, r, g, b))
         outclut.write(r.to_bytes(1,byteorder='big'))
         outclut.write(g.to_bytes(1,byteorder='big'))
         outclut.write(b.to_bytes(1,byteorder='big'))

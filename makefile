@@ -57,6 +57,7 @@ else
 	ifeq ($(UNAME_S),Darwin)
 		CFLAGS += -DUSE_METAL_API
 		SRC_MINIFB += $(wildcard minifb/src/macosx/*.m)
+		INC_DIRS += minifb/macosx/
 		LDFLAGS += -framework Cocoa \
 				   -framework QuartzCore \
 				   -framework Metal \
@@ -73,7 +74,7 @@ endif
 # Prepare objects and flags.
 SRC := $(SRC_MAIN) $(SRC_MINIFB)
 OBJ := $(SRC:.c=.o)
-OBJ += $(OBJ:.m=m.o)
+OBJ := $(OBJ:.m=.o)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 CFLAGS += $(INC_FLAGS)
 
@@ -81,7 +82,7 @@ CFLAGS += $(INC_FLAGS)
 
 .PHONY: clean
 
-%.m.o: %.m
+%.o: %.m
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 %.o: %.c

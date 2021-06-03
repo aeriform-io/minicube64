@@ -1,64 +1,87 @@
+.POSIX:
+.SUFFIXES:
 
-CC = gcc
+# Source code location of main program files.
+SRC_MAIN  := main.c \
+	cpu/fake6502.c \
+	assembler/asm6f.c \
+	machine/machine.c \
+	apu/wsg.c \
+	apu/nes_apu.c
 
-# general flags
+# Source code location of minifb library.
+SRC_MINIFB := \
+	utils/MiniFB_prim.c \
+    minifb/src/MiniFB_common.c \
+    minifb/src/MiniFB_internal.c \
+    minifb/src/MiniFB_timer.c
 
-CFLAGS = -DASM_LIB
-CFLAGS += -DNES_APU
-CFLAGS += -I cpu
-CFLAGS += -I sokol
-CFLAGS += -I assembler
-CFLAGS += -I apu
-CFLAGS += -I utils
-CFLAGS += -I machine
-CFLAGS += -I minifb/include
-CFLAGS += -I minifb/src
-# files to link
+# Include directories.
+INC_DIRS := \
+	cpu \
+	sokol \
+	assembler \
+	apu \
+	utils \
+	machine \
+	utils \
+	minifb/include \
+	minifb/src
 
-OBJ = main.o
-OBJ += cpu/fake6502.o
-OBJ += assembler/asm6f.o
-OBJ += machine/machine.o
-OBJ += apu/wsg.o
-OBJ += apu/nes_apu.o
-OBJ += utils/MiniFB_prim.o
-OBJ += minifb/src/MiniFB_common.o
-OBJ += minifb/src/MiniFB_internal.o
-OBJ += minifb/src/MiniFB_timer.o
+# Compiler and linker configuration.
+CC             := gcc
+CFLAGS         := -Wall -Wextra -pedantic
+CFLAGS         += -DASM_LIB
+CFLAGS         += -DNEW_APU
+LDFLAGS        := -Os
+RELEASE_CFLAGS := -DNDEBUG -O3
+DEBUG_CFLAGS   := -DDEBUG -O1 -g
 
-# link flags
+# Setup debug/release builds.
+#     make clean && make <target> DEBUG=0
+#     make clean && make <target> DEBUG=1
+DEBUG ?= 0
+ifeq ($(DEBUG), 1)
+    CFLAGS += $(DEBUG_CFLAGS)
+else
+    CFLAGS += $(RELEASE_CFLAGS)
+endif
 
-LDFLAGS = -Os
-
-# OS SPECIFIC
-
+# OS specific options.
 ifeq ($(OS),Windows_NT)
 	EXT = .exe
-	OBJ += minifb/src/windows/WinMiniFB.o
+	SRC_MINIFB += minifb/src/windows/WinMiniFB.c
 	LDFLAGS += -l gdi32 -l ole32
 else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Darwin)
 		CFLAGS += -DUSE_METAL_API
-		OBJ += minifb/src/macosx/OSXView.m.o
-		OBJ += minifb/src/macosx/OSXViewDelegate.m.o
-		OBJ += minifb/src/macosx/OSXWindow.m.o
-		OBJ += minifb/src/macosx/MacMiniFB.m.o
-		CFLAGS += -I minifb/macosx
-		LDFLAGS += -framework Cocoa -framework QuartzCore -framework Metal -framework MetalKit -framework AudioToolbox
+		SRC_MINIFB += $(wildcard minifb/src/macosx/*.m)
+		LDFLAGS += -framework Cocoa \
+				   -framework QuartzCore \
+				   -framework Metal \
+				   -framework MetalKit \
+				   -framework AudioToolbox
 	else ifeq ($(UNAME_S),Linux)
-		MINIFB = $(wildcard minifb/src/x11/*.c) 
-		OBJ += $(MINIFB:.c=.o) 
-		OBJ += minifb/src/MiniFB_linux.o 
-		CFLAGS += -Iminifb/include/ 
-		CFLAGS += -Iminifb/X11/ 
-		LDFLAGS = -lX11 -pthread -lasound 
+		SRC_MINIFB += $(wildcard minifb/src/x11/*.c)
+		SRC_MINIFB += minifb/src/MiniFB_linux.c
+		INC_DIRS += minifb/X11/
+		LDFLAGS += -lX11 -pthread -lasound
 	endif
 endif
 
-# work
+# Prepare objects and flags.
+SRC := $(SRC_MAIN) $(SRC_MINIFB)
+OBJ := $(SRC:.c=.o)
+OBJ += $(OBJ:.m=m.o)
+INC_FLAGS := $(addprefix -I,$(INC_DIRS))
+CFLAGS += $(INC_FLAGS)
 
-%.m.o:	%.m
+# Target rules.
+
+.PHONY: clean
+
+%.m.o: %.m
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 %.o: %.c
@@ -67,8 +90,5 @@ endif
 minicube$(EXT): $(OBJ)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
-
-.PHONY: clean
-
 clean:
-	rm $(OBJ)
+	rm -f $(OBJ)

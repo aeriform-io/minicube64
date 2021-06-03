@@ -270,7 +270,11 @@ void display_machine(struct mfb_window *window)
 		for (int x=0;x<64*MACHINE_SCALE;x++)
 		{
 			uint32_t p = mfb_getpix(window,x,y);
-			gif_frame[i] = p;
+			uint8_t r = p & 0xFF;
+			uint8_t g = p >> 8 & 0xFF;
+			uint8_t b = p >> 16 & 0xFF;
+			uint8_t a = p >> 24 & 0xFF;
+			gif_frame[i] = b | g << 8 | r << 16 | a << 24;
 			i++;
 		}
 	}

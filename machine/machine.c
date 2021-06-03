@@ -168,7 +168,7 @@ void next_view()
 	debug_view++;
 }
 
-void display_machine(struct mfb_window *window)
+void display_machine()
 {
 	int i=0;
 	uint8_t paletteblock = read6502(0x101);
@@ -194,7 +194,7 @@ void display_machine(struct mfb_window *window)
 			{
 				uint8_t byt = vram[i&0xfff];
 				int lookup = byt*3;
-				mfb_rect_fill(window,x*MACHINE_SCALE,y*MACHINE_SCALE,MACHINE_SCALE,MACHINE_SCALE,MFB_RGB(palette[lookup], palette[lookup+1],palette[lookup+2]));
+				mfb_rect_fill(x*MACHINE_SCALE,y*MACHINE_SCALE,MACHINE_SCALE,MACHINE_SCALE,MFB_RGB(palette[lookup], palette[lookup+1],palette[lookup+2]));
 				i++;
 			}
 		}
@@ -203,7 +203,7 @@ void display_machine(struct mfb_window *window)
 	if (debug_view==1)
 	{
 		// 	scaled down with debug
-		mfb_rect_fill(window,0,0,(64*MACHINE_SCALE),(64*MACHINE_SCALE),0x00101010);
+		mfb_rect_fill(0,0,(64*MACHINE_SCALE),(64*MACHINE_SCALE),0x00101010);
 
 		i = 0;
 		for (int y=0;y<64;y++)
@@ -213,7 +213,7 @@ void display_machine(struct mfb_window *window)
 				uint8_t byt = vram[i&0xfff];
 				int lookup = byt*3;
 
-				mfb_setpix(window,((64*MACHINE_SCALE)-64)+x,y,MFB_RGB(palette[lookup], palette[lookup+1],palette[lookup+2]));
+				mfb_setpix(((64*MACHINE_SCALE)-64)+x,y,MFB_RGB(palette[lookup], palette[lookup+1],palette[lookup+2]));
 				i++;
 			}
 		}
@@ -222,7 +222,7 @@ void display_machine(struct mfb_window *window)
 		uint8_t v = read6502(IO_VIDEO);
 		uint8_t kb = read6502(IO_INPUT);
 		sprintf(regs_line,"%04X SP:%02X A:%02X X:%02X Y:%02X VP:%X P1:%02X", pc,sp,a,x,y,v,kb);
-		mfb_print(window,0,0,MFB_RGB(0,255,255),regs_line);
+		mfb_print(0,0,MFB_RGB(0,255,255),regs_line);
 
 		uint8_t addr = 0;
 		for (int y=72;y<200;y+=8)
@@ -233,9 +233,9 @@ void display_machine(struct mfb_window *window)
 				uint8_t zp = memory[addr];
 				sprintf(regs_line,"%02X", zp);
 				if (zp==0) {
-					mfb_print(window,x,y,MFB_RGB(64,64,64),"--");
+					mfb_print(x,y,MFB_RGB(64,64,64),"--");
 				} else {
-					mfb_print(window,x,y,MFB_RGB(255,255,255),regs_line);
+					mfb_print(x,y,MFB_RGB(255,255,255),regs_line);
 				}
 				addr++;
 			}
@@ -248,7 +248,7 @@ void display_machine(struct mfb_window *window)
 			char debug_line[256];
 			uint16_t len = disasm6502(npc,debug_line,256);
 
-			mfb_print(window,0,y,MFB_RGB(255,255,255),debug_line);
+			mfb_print(0,y,MFB_RGB(255,255,255),debug_line);
 			npc+=len;
 		}
 
@@ -256,30 +256,32 @@ void display_machine(struct mfb_window *window)
 		{
 			int16_t byt = audio_buffer[i*8];
 			float f = CLAMP((((float)byt/32767.0f)),-1.0f,1.0f);
-			mfb_setpix(window,
-									i,
+			mfb_setpix(i,
 									222+f*32.0f,
 									MFB_RGB(255,255,255));
 		}
 	}
 
 	//	save gif
-	i=0;
-	for (int y=0;y<64*MACHINE_SCALE;y++)
+	if (vramblock!=0)
 	{
-		for (int x=0;x<64*MACHINE_SCALE;x++)
+		i=0;
+		for (int y=0;y<64*MACHINE_SCALE;y++)
 		{
-			uint32_t p = mfb_getpix(window,x,y);
-			uint8_t r = p & 0xFF;
-			uint8_t g = p >> 8 & 0xFF;
-			uint8_t b = p >> 16 & 0xFF;
-			uint8_t a = p >> 24 & 0xFF;
-			gif_frame[i] = b | g << 8 | r << 16 | a << 24;
-			i++;
+			for (int x=0;x<64*MACHINE_SCALE;x++)
+			{
+				uint32_t p = mfb_getpix(x,y);
+				uint8_t r = p & 0xFF;
+				uint8_t g = p >> 8 & 0xFF;
+				uint8_t b = p >> 16 & 0xFF;
+				uint8_t a = p >> 24 & 0xFF;
+				gif_frame[i] = b | g << 8 | r << 16 | a << 24;
+				i++;
+			}
 		}
+		msf_gif_frame(&gifState,(uint8_t*)&gif_frame[0], 2, 32, (64*MACHINE_SCALE)*4);
 	}
-	msf_gif_frame(&gifState,(uint8_t*)&gif_frame[0], 2, 32, (64*MACHINE_SCALE)*4);
-
+	
 	if ((status & FLAG_INTERRUPT)==0)
 	{
 		irq6502();

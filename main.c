@@ -7,8 +7,8 @@
 #include "fake6502.h"
 #include "WindowData.h"
 
-static uint32_t  g_width  = 64*MACHINE_SCALE;
-static uint32_t  g_height = 64*MACHINE_SCALE;
+uint32_t  g_width  = 64*MACHINE_SCALE;
+uint32_t  g_height = 64*MACHINE_SCALE;
 uint32_t *g_buffer = 0x0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,7 +121,7 @@ int main(int argc,char **argv)
 
     mfb_update_state state;
     do {
-        display_machine(window);
+        display_machine();
         state = mfb_update_ex(window, g_buffer, g_width, g_height);
         if (state != STATE_OK) {
             window = 0x0;

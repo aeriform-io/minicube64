@@ -8,41 +8,39 @@
 #include <MiniFB_internal.h>
 
 extern uint32_t *g_buffer;
+extern uint32_t g_width;
+extern uint32_t g_height;
 
-
-uint32_t mfb_getpix(struct mfb_window *window,int x,int y)
+uint32_t mfb_getpix(int x,int y)
 {
 	unsigned int *buffer;
-	SWindowData *window_data = (SWindowData *) window;
-	buffer = (unsigned int*) window_data->draw_buffer;
   buffer = g_buffer;
 	if (buffer!=NULL)
 	{
-		if ((x>=0) && (x<window_data->buffer_width) && 
-				(y>=0) && (y<window_data->buffer_height))
+		if ((x>=0) && (x<g_width) && 
+				(y>=0) && (y<g_height))
 		{
-			return (buffer[x+(y*window_data->buffer_width)]);
+			return (buffer[x+(y*g_width)]);
 		}
 	}
 	return 0;
 }
 
-void mfb_setpix(struct mfb_window *window,int x,int y,uint32_t rgba)
+void mfb_setpix(int x,int y,uint32_t rgba)
 {
 	unsigned int *buffer;
-	SWindowData *window_data = (SWindowData *) window;
-	buffer = (unsigned int*) window_data->draw_buffer;
+  buffer = g_buffer;
 	if (buffer!=NULL)
 	{
-		if ((x>=0) && (x<window_data->buffer_width) && 
-				(y>=0) && (y<window_data->buffer_height))
+		if ((x>=0) && (x<g_width) && 
+				(y>=0) && (y<g_height))
 		{
-			buffer[x+(y*window_data->buffer_width)]=rgba;
+			buffer[x+(y*g_width)]=rgba;
 		}
 	}
 }
 
-void mfb_line(struct mfb_window *window, int x0, int y0, int x1, int y1, uint32_t rgba)
+void mfb_line(int x0, int y0, int x1, int y1, uint32_t rgba)
 {
 	int sx, sy, dx, dy, err, e2;
 	dx = abs(x1 - x0);
@@ -51,17 +49,17 @@ void mfb_line(struct mfb_window *window, int x0, int y0, int x1, int y1, uint32_
 	if (y0 < y1) sy = 1; else sy = -1;
 	err = dx - dy;
 
-	mfb_setpix(window, x0, y0, rgba);
+	mfb_setpix(x0, y0, rgba);
 	while (x0 != x1 || y0 != y1)
 	{
-		mfb_setpix(window, x0, y0, rgba);
+		mfb_setpix(x0, y0, rgba);
 		e2 = 2*err;
 		if (e2 > -dy) { err -= dy; x0 += sx; }
 		if (e2 <  dx) { err += dx; y0 += sy; }
 	}
 }
 
-void mfb_rect(struct mfb_window *window, int x, int y, int w, int h, uint32_t rgba)
+void mfb_rect(int x, int y, int w, int h, uint32_t rgba)
 {
 	int x1, y1;
 	if (w <= 0 || h <= 0)
@@ -69,44 +67,41 @@ void mfb_rect(struct mfb_window *window, int x, int y, int w, int h, uint32_t rg
 	
 	x1 = x + w-1;
 	y1 = y + h-1;
-	mfb_line(window, x, y, x1, y, rgba);
-	mfb_line(window, x1, y, x1, y1, rgba);
-	mfb_line(window, x1, y1, x, y1, rgba);
-	mfb_line(window, x, y1, x, y, rgba);
+	mfb_line(x, y, x1, y, rgba);
+	mfb_line(x1, y, x1, y1, rgba);
+	mfb_line(x1, y1, x, y1, rgba);
+	mfb_line(x, y1, x, y, rgba);
 }
 
-void mfb_rect_fill(struct mfb_window *window, int x, int y, int w, int h, uint32_t rgba)
+void mfb_rect_fill(int x, int y, int w, int h, uint32_t rgba)
 {
 	for (int py=y;py<y+h;py++)
-		mfb_line(window,x,py,x+w,py,rgba);	
+		mfb_line(x,py,x+w,py,rgba);	
 }
 
-void mfb_blit(struct mfb_window *window, uint32_t *src, int dx, int dy, int w, int h,int stride)
+void mfb_blit(uint32_t *src, int dx, int dy, int w, int h,int stride)
 {
 	uint32_t *td, *ts;
 	int st, dt;
-	SWindowData *window_data = (SWindowData *) window;
-	unsigned int *buffer = (unsigned int*) window_data->draw_buffer;
 	//	warning no clipping yet 
 	ts = src;
-	td = &buffer[dy*window_data->buffer_width + dx];
-	dt = window_data->buffer_width;
+	td = &g_buffer[dy*g_width + dx];
 	do {
 		memcpy(td, ts, w*sizeof(uint32_t));
 		ts += stride;
-		td += dt;
+		td += g_width;
 	} while(--h);
 }
 
-void mfb_box(struct mfb_window *window,int x0,int y0,int x1,int y1,uint32_t rgba)
+void mfb_box(int x0,int y0,int x1,int y1,uint32_t rgba)
 {
-	mfb_line(window,x0,y0,x1,y0,rgba);
-	mfb_line(window,x0,y1,x1,y1,rgba);
-	mfb_line(window,x0,y0,x0,y1,rgba);
-	mfb_line(window,x1,y0,x1,y1,rgba);
+	mfb_line(x0,y0,x1,y0,rgba);
+	mfb_line(x0,y1,x1,y1,rgba);
+	mfb_line(x0,y0,x0,y1,rgba);
+	mfb_line(x1,y0,x1,y1,rgba);
 }
 
-void mfb_box_fill(struct mfb_window *window,int x0,int y0,int x1,int y1,uint32_t rgba)
+void mfb_box_fill(int x0,int y0,int x1,int y1,uint32_t rgba)
 {
 int y2 = y0;
 	if (y1>y2)
@@ -115,31 +110,31 @@ int y2 = y0;
 		y1 = y0;
 	}
 	for (int y=y1;y<y2;y++)
-		mfb_line(window,x0,y,x1,y,rgba);	
+		mfb_line(x0,y,x1,y,rgba);	
 }
 
-void mfb_circle(struct mfb_window *window,int sx, int sy, int radius, uint32_t rgba)
+void mfb_circle(int sx, int sy, int radius, uint32_t rgba)
 {
 	int r = radius;
 	int x = -r, y = 0, err = 2-2*r;
 	do {
-		mfb_setpix(window,sx-x,sy+y,rgba);
-		mfb_setpix(window,sx-y,sy-x,rgba);
-		mfb_setpix(window,sx+x,sy-y,rgba);
-		mfb_setpix(window,sx+y,sy+x,rgba);
+		mfb_setpix(sx-x,sy+y,rgba);
+		mfb_setpix(sx-y,sy-x,rgba);
+		mfb_setpix(sx+x,sy-y,rgba);
+		mfb_setpix(sx+y,sy+x,rgba);
 		r = err;
 		if (r <= y) err += ++y*2+1;
 		if (r > x || err > y) err += ++x*2+1;
 	} while (x <= 0);
 }
 
-void mfb_circle_fill(struct mfb_window *window,int sx, int sy, int radius, uint32_t rgba)
+void mfb_circle_fill(int sx, int sy, int radius, uint32_t rgba)
 {
 	int r = radius;
 	int x = -r, y = 0, err = 2-2*r;
 	do {
-		mfb_line(window,sx-x-1,sy+y,sx+x,sy+y,rgba);
-		mfb_line(window,sx-x-1,sy-y,sx+x,sy-y,rgba);
+		mfb_line(sx-x-1,sy+y,sx+x,sy+y,rgba);
+		mfb_line(sx-x-1,sy-y,sx+x,sy-y,rgba);
 
 		r = err;
 		if (r <= y) err += ++y*2+1;
@@ -346,7 +341,7 @@ unsigned char mfb_tom_thumb_bits[] =
    0xbd, 0xbb, 0xae, 0xfa, 0xd9, 0x8a, 0xdf, 0xdd, 0xaa, 0xf8, 0xa8, 0x8a,
    0xef, 0xfe, 0xaa, 0xf8, 0xab, 0x88, 0xff, 0xde, 0xd9, 0x8a, 0xdc, 0x88 };
 
-void mfb_putch(struct mfb_window *window,unsigned short c,int x, int y,uint32_t rgba)
+void mfb_putch(unsigned short c,int x, int y,uint32_t rgba)
 {
 		int frow, fcol, byte;
     int i, j;
@@ -365,15 +360,15 @@ void mfb_putch(struct mfb_window *window,unsigned short c,int x, int y,uint32_t 
 				{
 					if(!(bits & (1 << i)))
 					{
-						mfb_setpix(window,x+i,y+j+1,0xff000000);
-						mfb_setpix(window,x+i,y+j,rgba);
+						mfb_setpix(x+i,y+j+1,0xff000000);
+						mfb_setpix(x+i,y+j,rgba);
 					}
 				}
         byte += 6;
     }
 }
 
-void mfb_print(struct mfb_window *window,int x, int y, uint32_t rgba, const char *text, ...)
+void mfb_print(int x, int y, uint32_t rgba, const char *text, ...)
 {
 static int stb_fontinit=0;
 	char tmp[1024];
@@ -390,7 +385,7 @@ static int stb_fontinit=0;
 	p = tmp;
 	while (*p)
 	{
-		mfb_putch(window,*p,x,y,rgba);
+		mfb_putch(*p,x,y,rgba);
 		x+=4;
 		p++;
 	}

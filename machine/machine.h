@@ -3,7 +3,7 @@
 #define MACHINE_SCALE 4
 
 void reset_machine();
-void display_machine(struct mfb_window *window);
+void display_machine();
 void next_view();
 void kill_machine();
 

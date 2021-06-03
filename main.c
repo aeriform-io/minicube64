@@ -5,6 +5,7 @@
 
 #include "machine.h"
 #include "fake6502.h"
+#include "WindowData.h"
 
 static uint32_t  g_width  = 64*MACHINE_SCALE;
 static uint32_t  g_height = 64*MACHINE_SCALE;

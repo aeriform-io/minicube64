@@ -248,4 +248,4 @@ SetPos:
 
   hex 000000 ff0000 ff00ff 0000ff 00ffff 00ff00 ffffff
 sprite:
-  incbin "tool/dvd.raw"
+  incbin "demos/boundary/dvd.raw"

@@ -21,7 +21,7 @@ MsfGifState gifState = {};
 #include "sokol_audio.h"
 
 uint8_t memory[1<<16];
-uint8_t default_palette[64*3];
+uint8_t default_palette[256*3];
 int debug_view = 0;
 
 
@@ -198,7 +198,7 @@ void display_machine()
 		{
 			for (int x=0;x<64;x++)
 			{
-				uint8_t byt = vram[i&0xfff]&0x3f;
+				uint8_t byt = vram[i&0xfff];
 				int lookup = byt*3;
 				mfb_rect_fill(x*MACHINE_SCALE,y*MACHINE_SCALE,MACHINE_SCALE,MACHINE_SCALE,MFB_RGB(palette[lookup], palette[lookup+1],palette[lookup+2]));
 				i++;

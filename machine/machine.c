@@ -21,7 +21,7 @@ MsfGifState gifState = {};
 #include "sokol_audio.h"
 
 uint8_t memory[1<<16];
-uint8_t default_palette[768];
+uint8_t default_palette[256*3];
 int debug_view = 0;
 
 
@@ -103,14 +103,20 @@ char debug_line[256];
 	for (int i = 0; i < 256*256; ++i)
 		memory[i] = 0;
 
-	//	default palette
-	for (int q=0;q<240;q++)
+	int q =0 ;
+	for (int r=0;r<4;r++)
 	{
-		default_palette[(q*3)+0] = (q % 6) * 0x33;
-		default_palette[(q*3)+1] = ((q/6) % 6) * 0x33;
-		default_palette[(q*3)+2] = ((q/36) % 6) * 0x33;
+		for (int g=0;g<4;g++)
+		{
+			for (int b=0;b<4;b++)
+			{
+				default_palette[q]=b*85;
+				default_palette[q+1]=g*85;
+				default_palette[q+2]=r*85;
+				q+=3;
+			}
+		}
 	}
-
 
 	if (fname!=NULL)
 	{
@@ -281,7 +287,7 @@ void display_machine()
 		}
 		msf_gif_frame(&gifState,(uint8_t*)&gif_frame[0], 2, 32, (64*MACHINE_SCALE)*4);
 	}
-	
+
 	if ((status & FLAG_INTERRUPT)==0)
 	{
 		irq6502();

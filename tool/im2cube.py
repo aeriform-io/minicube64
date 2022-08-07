@@ -22,8 +22,8 @@ def main():
     image = Image.open(basename)
     (w, h) = image.size
 
-    if w>64 or h>64:
-        print(CYEL + "WARNING: Images larger than 64x64 will not load." + CEND)
+    if w>64:
+        print(CYEL + "WARNING: Images wider 64 pixels are not advised." + CEND)
 
     original_palette = image.getpalette()
 
@@ -53,6 +53,7 @@ def main():
     print(outname)
     print(outclutname)
     print()
+    print('Palette:')
 
     outraw = open(outname, "wb")
     outclut = open(outclutname, "wb")
@@ -64,13 +65,14 @@ def main():
 
     for i in range(len(palette)):
         (r,g,b) = palette[i]
-        print('index %02x: #%02x%02x%02x' % (i, r, g, b))
+        print('hex #%02x%02x%02x ;%02x' % (r, g, b, i))
         outclut.write(r.to_bytes(1,byteorder='big'))
         outclut.write(g.to_bytes(1,byteorder='big'))
         outclut.write(b.to_bytes(1,byteorder='big'))
 
     outraw.close()
     outclut.close()
+    print()
 
 if __name__ == '__main__':
    main()

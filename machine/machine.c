@@ -183,6 +183,10 @@ void display_machine()
 		palette = &default_palette[0];
 
 	uint8_t vramblock = read6502(0x100);
+	if (vramblock > 0xf) {
+		printf("VIDEO register out of valid range ($%x), constraining to to $0-$f.\n", vramblock);
+		vramblock = vramblock & 0x10;
+	}
 	uint8_t *vram = &memory[vramblock*4096];
 	uint8_t byt;
 

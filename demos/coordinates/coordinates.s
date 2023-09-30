@@ -4,76 +4,79 @@
 include "64cube.inc"
 
 MACRO _setVideo page
-	lda #$page
-	sta VIDEO
-	asl
-	asl
-	asl
-	asl
-	sta video_page
+    lda #$page
+    sta VIDEO
+    asl
+    asl
+    asl
+    asl
+    sta video_page
 ENDM
 
 ENUM $0
-	xpos		db	0	; x and y coordinates as pure binary values
-	ypos		db	0
-	video_page 	db	0	; convenient for conversions to pixel address
-	adrL		db	0	; pointer to an actual screen pixel address
-	adrH		db	0
+    xpos          db	0	; x and y coordinates as pure binary values
+    ypos          db	0
+    video_page 	  db	0	; convenient for conversions to pixel address
+    adrL          db	0	; pointer to an actual screen pixel address
+    adrH          db	0
 ENDE
 
-white EQU #$3f
+white EQU $3f
 
 org $200
 init:
-	sei	; disable interrupts
-	ldx #$ff
-	txs	; reset stack
+    sei	; disable interrupts
+    ldx #$ff
+    txs	; reset stack
 
-	_setVideo 2
-  	_setw atVblank,VBLANK_IRQ
+    _setVideo 2
+    _setw atVblank,VBLANK_IRQ
+    
+    ; initialize adrL/H based on contents of xpos and ypos
+    jsr XYposToScreenAddress
 
-  	cli	; allow per-frame interrupts
+    cli	; allow per-frame interrupts
 
 ; loop broken only by interrupts
 whileInactiveLoop: 
-	jmp whileInactiveLoop
+    jmp whileInactiveLoop
 
 ; draw a pixel according to the address held in adrL/H
 drawToScreen:
-	lda white
-	ldy #0
-	sta (adrL), y
+    lda #white
+    ldx #0
+    sta (adrL, x)
 rts
 
 ;called once per frame
 atVblank:
-	jsr drawToScreen
+    jsr drawToScreen
 
-	; move next potential pixel location down-right
-	inc xpos
-	inc ypos
-	jsr validateXYpos	; prevent drawing outside of the screen
-	jsr XYposToScreenAddress	; prepare draw routine's input
-	rti
+    ; move next potential pixel location down-right
+    inc xpos
+    inc ypos
+    jsr validateXYpos	; prevent drawing outside of the screen
+    jsr XYposToScreenAddress	; prepare draw routine's input
+    rti
 
 validateXYpos
-	; cmp is sec then A - M (simulated) to set/clear flags NZC
-	; 	sec xpos - 64 = unused carry if xpos >= 64
-	; A:xpos	M:#64
-	; Stop drawing if xpos or ypos >= 64
+    ; cmp is sec then A - M (simulated) to set/clear flags NZC
+    ; 	sec xpos - 64 = unused carry if xpos >= 64
+    ; A:xpos	M:#64
+    ; Stop drawing if xpos or ypos >= 64
 
-	lda xpos
-	cmp #64
-	bcs stopDrawing
+    lda xpos
+    cmp #64
+    bcs stopDrawing
 
-	lda ypos
-	cmp #64
-	bcs stopDrawing
+    lda ypos
+    cmp #64
+    bcs stopDrawing
 rts
 
 stopDrawing:
-	pla	; decrement the stack since it skips returning from subroutine
-	sei	; disable interrupts to prevent more vblank interrupts
+    pla	; decrement the stack since it skips returning from subroutine
+    sei	; disable interrupts to prevent more vblank interrupts
 jmp whileInactiveLoop ; interrupts disabled means it just loops
 
 
@@ -107,16 +110,16 @@ jmp whileInactiveLoop ; interrupts disabled means it just loops
 ;		Nibble0:			 xxxx
 
 ; So, if #$f was stored in VIDEO, video_page would be $f0: 1111 0000 in bits.
-; Let's set the screen to x,y: 45,27  --->	xpos:2D, ypos:1B
-; 		xpos: __101101		Shift left twice to prepare for rolling right.
-; 	new xpos: 	101101__	The blanks just represent zero bits.
+; Let's set the screen to x,y: 45,27  --->  xpos:2D, ypos:1B
+;               xpos: __101101		Shift left twice to prepare for rolling right.
+;       new xpos:       101101__	The blanks just represent zero bits.
 
 ; 		ypos: 00011011		Use lsr to avoid carrying bits into ypos.
 ; ror'd ypos: 00001101 -> 1 into the Carry flag.				
 
 ; Since we now have xpos prepared to accept carry bits from ypos, we do that.
-; 		xpos: 1011 0100
-; 	 C: 1 -> ror'd-xpos -> C just gets the insignificant zero bits from ror.
+; 	        xpos: 1011 0100
+;             C: 1 -> ror'd-xpos -> C just gets the insignificant zero bits from ror.
 ;     result: 1101 1010  with  C:0
 
 ; Then we get another bit from ypos put into Carry.
@@ -141,31 +144,36 @@ jmp whileInactiveLoop ; interrupts disabled means it just loops
 ; 		 --------------------------------
 
 screenAddressToXYpos:
-	lda adrH
-	and #$0f
-	sta ypos
-	lda adrL
-	asl
-	rol ypos
-	asl
-	rol ypos
-	lda adrL
-	and #$3f
-	sta xpos
+    lda adrH
+    and #$0f
+    sta ypos
+    lda adrL
+    asl
+    rol ypos
+    asl
+    rol ypos
+    lda adrL
+    and #$3f
+    sta xpos
 rts
 
 XYposToScreenAddress:
-	lda ypos
-	sta adrH
-	lda xpos
-	asl
-	asl
-	lsr adrH
-	ror
-	lsr adrH
-	ror
-	sta adrL
-	lda video_page
-	ora adrH
-	sta adrH
+    lda ypos
+    sta adrH
+    lda xpos
+    asl
+    asl
+    lsr adrH
+    ror
+    lsr adrH
+    ror
+    sta adrL
+    lda video_page
+    ora adrH
+    sta adrH
+rts
+
+
+updateXYdisplay:
+
 rts

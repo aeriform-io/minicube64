@@ -99,49 +99,49 @@ jmp whileInactiveLoop ; interrupts disabled means it just loops
 ; Getting a usable address out of x/y coordinates is a little more tricky.
 ; Since these on their own can't fill up the entire bit range of either one's
 ; 	8-bit space, there will be some high 0 bits to contend with.
-;		xpos bits: 00xx xxxx
-;		ypos bits: 00yy yyyy
+;      xpos bits: 00xx xxxx
+;      ypos bits: 00yy yyyy
 
 ; Also, the video page will need to be the topmost nibble to get it on the right screen.
 ; Nibbles of adrH/L shown high-to-low in significance (big-endian) for readability:
-;		Nibble3: pppp
-;		Nibble2:     yyyy
-;		Nibble1:         yyxx
-;		Nibble0:			 xxxx
+;	Nibble3:  pppp
+;	Nibble2:      yyyy
+;	Nibble1:          yyxx
+;	Nibble0:              xxxx
 
 ; So, if #$f was stored in VIDEO, video_page would be $f0: 1111 0000 in bits.
 ; Let's set the screen to x,y: 45,27  --->  xpos:2D, ypos:1B
-;               xpos: __101101		Shift left twice to prepare for rolling right.
-;       new xpos:       101101__	The blanks just represent zero bits.
+;       xpos: __101101		Shift left twice to prepare for rolling right.
+;   new xpos:   101101__	The blanks just represent zero bits.
 
-; 		ypos: 00011011		Use lsr to avoid carrying bits into ypos.
+;       ypos: 00011011		Use lsr to avoid carrying bits into ypos.
 ; ror'd ypos: 00001101 -> 1 into the Carry flag.				
 
 ; Since we now have xpos prepared to accept carry bits from ypos, we do that.
-; 	        xpos: 1011 0100
-;             C: 1 -> ror'd-xpos -> C just gets the insignificant zero bits from ror.
+;       xpos: 1011 0100
+;     C: 1 -> ror'd-xpos -> C just gets the insignificant zero bits from ror.
 ;     result: 1101 1010  with  C:0
 
 ; Then we get another bit from ypos put into Carry.
-; 		ypos: 0000 1101
-; lsr'd ypos: 0000 0110 -> 1 into C
-;  partial adrH:  ^
+;         ypos: 0000 1101
+;   lsr'd ypos: 0000 0110 -> 1 into C
+;    partial adrH:  ^
 
 ; Now that we've shifted it twice, the y bits that make up adrH are in place.
 ; So, if we want to finish it off, we can just slap the page bits over it.
-; 		video_page: 1111 0000
-;  			  adrH: 0000 0110  as from the ypos shifted-right twice
-; 	   OR-combined: 1111 0110
+;      video_page: 1111 0000
+;            adrH: 0000 0110  as from the ypos shifted-right twice
+;     OR-combined: 1111 0110
 ; adrH is now complete, and Carry still has 1 from the lsr operation previously.
 
 ; Rolling the carry bit into xpos a second time completes adrL.
-; 		xpos: 1101 1010
-; 	 C: 1 -> ror'd-xpos -> C, which becomes 0
-; 		adrL: 1110 1101
+;               xpos: 1101 1010
+;             C: 1 -> ror'd-xpos -> C, which becomes 0
+;               adrL: 1110 1101
 
-; 		 --------------------------------
-; 		|   End of Lengthy Explanation   |  	( Implementation Follows )
-; 		 --------------------------------
+;      --------------------------------
+;     |   End of Lengthy Explanation   |  	( Implementation Follows )
+;      --------------------------------
 
 screenAddressToXYpos:
     lda adrH

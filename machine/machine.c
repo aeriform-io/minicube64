@@ -93,7 +93,7 @@ void my_stream_callback(float* buffer, int num_frames, int num_channels)
 	}
 }
 
-void reset_machine(char *fname)
+void reset_machine(const char *fname)
 {
 char debug_line[256];
 

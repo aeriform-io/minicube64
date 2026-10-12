@@ -19,8 +19,8 @@
   ldx #0
 -
   txa
-  sta $f000,x
   and #$3f
+  sta $f000,x
   sta $f100,x
   sta $f200,x
   sta $f300,x
